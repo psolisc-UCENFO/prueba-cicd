@@ -41,5 +41,13 @@
         "lines": 70
       }
     }
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/psolisc-UCENFO/prueba-cicd.git"
+  },
+  "bugs": {
+    "url": "https://github.com/psolisc-UCENFO/prueba-cicd/issues"
+  },
+  "homepage": "https://github.com/psolisc-UCENFO/prueba-cicd#readme"
 }
