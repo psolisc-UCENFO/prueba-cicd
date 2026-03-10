@@ -1,14 +1,14 @@
-name: CI
+name: CI-Security
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   ci:
-    name: ci
+    name: Build-Test-Security
     runs-on: ubuntu-latest
 
     steps:
@@ -21,14 +21,42 @@ jobs:
           node-version: "20"
           cache: "npm"
 
-      - name: Build - install dependencies
+      - name: Install dependencies
         run: npm ci
 
-      - name: Test - unit tests
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Build
+        run: npm run build --if-present
+
+      - name: Unit tests
         run: npm test
+
+      # SCA - Escaneo de dependencias
+      - name: SCA - Dependency Audit
+        run: npm audit --audit-level=critical
+
+      # Docker build
+      - name: Build Docker image
+        run: docker build -t myapp:latest .
+
+      # Gestión de secretos
+      - name: Use CICD_SECRET
+        run: echo "Using CICD_SECRET"
+        env:
+            CICD_SECRET: ${{ secrets.CICD_SECRET }}  
+
+      # Escaneo de contenedores con Trivy
+      - name: Scan Docker image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "myapp:latest"
+          severity: "CRITICAL,HIGH"
+          exit-code: "1"
 
       - name: Deploy - simulated
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
-          echo "✅ Deploy simulation successful"
+          echo "Deploy simulation successful"
           echo "Commit: $GITHUB_SHA"
